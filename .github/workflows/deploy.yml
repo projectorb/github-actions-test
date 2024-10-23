@@ -1,0 +1,37 @@
+name: "Deploy to Server"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v2
+
+      - name: "Install dependencies"
+        run: npm install
+
+      - name: "Deploy to Server"
+        uses: "easingthemes/ssh-deploy@v2.1.5"
+        env:
+            SSH_PRIVATE_KEY : ${{ secrets.SSH_PRIVATE_KEY }}
+            REMOTE_HOST : ${{ secrets.REMOTE_HOST }}
+            REMOTE_USER : ${{ secrets.REMOTE_USER }}
+            TARGET: /opt/bitnami/projects/github-actions-test
+            SOURCE: "./"
+
+      - name : "Run remote commands"
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/bitnami/projects/github-actions-test
+            npm install
+            npm run build
+          
