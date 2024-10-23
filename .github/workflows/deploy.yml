@@ -15,14 +15,14 @@ jobs:
       - name: "Install dependencies"
         run: npm install
 
-      - name: "Deploy to Server"
+      - name: "Synchronize Files to Server"
         uses: "easingthemes/ssh-deploy@v2.1.5"
         env:
             SSH_PRIVATE_KEY : ${{ secrets.SSH_PRIVATE_KEY }}
             REMOTE_HOST : ${{ secrets.REMOTE_HOST }}
             REMOTE_USER : ${{ secrets.REMOTE_USER }}
             TARGET: /opt/bitnami/projects/github-actions-test
-            SOURCE: "./"
+            SOURCE: "."
 
       - name : "Run remote commands"
         uses: appleboy/ssh-action@v0.1.6
@@ -32,6 +32,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /opt/bitnami/projects/github-actions-test
-            npm install
             npm run build
           
