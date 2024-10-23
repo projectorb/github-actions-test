@@ -9,11 +9,16 @@ jobs:
   deploy:
     runs-on: "ubuntu-latest"
     steps:
+			- name: "Check Rsync Version"
+				uses: GuillaumeFalourd/setup-rsync@v1.2
+				run: rsync --version
+
       - name: "Checkout Code"
         uses: actions/checkout@v2
 
       - name: "Install dependencies"
         run: npm install
+
 
       - name: "Synchronize Files to Server"
         uses: "easingthemes/ssh-deploy@v2.1.5"
