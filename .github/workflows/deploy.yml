@@ -9,24 +9,23 @@ jobs:
   deploy:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: GuillaumeFalourd/setup-rsync@v1.2
-      - run: rsync --version
-
       - name: "Checkout Code"
         uses: actions/checkout@v2
 
-      - name: "Install dependencies"
-        run: npm install
+      - name: "Install Node.js"
+				uses: actions/setup-node@v2
+				with:
+					node-version: "22.2.0"
 
       - name: "Synchronize Files to Server"
         uses: "easingthemes/ssh-deploy@v2.1.5"
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+					SOURCE: "."
+					SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: /opt/bitnami/projects/github-actions-test
-          SOURCE: "."
-
+          
       - name: "Run remote commands"
         uses: appleboy/ssh-action@v0.1.6
         with:
