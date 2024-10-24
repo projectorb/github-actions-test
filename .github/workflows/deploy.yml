@@ -1,5 +1,6 @@
-name: "Deploy to Server"
+name: Deployment Workflow
 
+# Trigger this workflow on pushes to the specified branch
 on:
   push:
     branches:
@@ -7,31 +8,28 @@ on:
 
 jobs:
   deploy:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
+
     steps:
-      - name: "Checkout Code"
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: "Install Node.js"
-				uses: actions/setup-node@v2
-				with:
-					node-version: "22.2.0"
+      - name: Install dependencies
+        run: npm install
 
-      - name: "Synchronize Files to Server"
-        uses: "easingthemes/ssh-deploy@v2.1.5"
-        env:
-					SOURCE: "."
-					SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: /opt/bitnami/projects/github-actions-test
-          
-      - name: "Run remote commands"
-        uses: appleboy/ssh-action@v0.1.6
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: SSH Deploy
+        # Use the 'appleboy/ssh-action' action for SSH deployment
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.REMOTE_HOST }} # Your server's IP address
+          username: ${{ secrets.REMOTE_USER }} # Your server's username
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # Your server's SSH private key
           script: |
-            cd /opt/bitnami/projects/github-actions-test
+            cd /opt/bitnami/projects/github-actions-test # Specify the path to your app directory on the server
+            git pull
+            npm install
             npm run build
+            pm2 restart your-pm2-service-name # Replace with your PM2 service name
