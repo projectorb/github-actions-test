@@ -14,22 +14,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22.2.0'
 
-      - name: Build Next.js app
-        run: npm run build
+      - name: Install Node.js dependencies
+        run: npm install
 
       - name: SSH Deploy
         # Use the 'appleboy/ssh-action' action for SSH deployment
-        uses: appleboy/ssh-action@master
+        uses: easingthemes/ssh-deploy@v5.1.1
         with:
-          host: ${{ secrets.REMOTE_HOST }} # Your server's IP address
-          username: ${{ secrets.REMOTE_USER }} # Your server's username
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # Your server's SSH private key
-          script: |
-            cd /opt/bitnami/projects/github-actions-test # Specify the path to your app directory on the server
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          EXCLUDE: ".git*,node_modules,.next"
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "."
+          TARGET: "/opt/bitnami/projects/github-actions-test" # Specify the path to your app directory on the server
+          SCRIPT_AFTER: |
             git pull
             npm install
             npm run build
-            pm2 restart your-pm2-service-name # Replace with your PM2 service name
