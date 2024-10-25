@@ -52,6 +52,5 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ls -al /opt/bitnami/projects/github-actions-test
-            cd /opt/bitnami/projects/github-actions-test
-            node -v
+            cd /opt/bitnami/projects/github-actions-test && ./.scripts/build.sh
+            
