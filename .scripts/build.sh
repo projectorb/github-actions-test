@@ -9,6 +9,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # nvm install
 
-npm run build
+npm help
 
 echo "Build complete."
