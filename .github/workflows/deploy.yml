@@ -10,40 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'  # Set to your Node.js version
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '18'  # Set to your Node.js version
 
-      - name: Install dependencies
-        run: npm install
+      # - name: Install dependencies
+      #   run: npm install
 
-      - name: Build Next.js app
-        run: npm run build
+      # - name: Build Next.js app
+      #   run: npm run build
 
-      - name: Archive production files
-        run: tar -czf build.tar.gz .next package.json
+      # - name: Archive production files
+      #   run: tar -czf build.tar.gz .next package.json
       
-      - name: Check SSH Key Access
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -c
+      # - name: Check SSH Key Access
+      #   run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -c
 
-      - name: Debug User Value
-        run: echo " Lightsail User = ${{ secrets.REMOTE_USER }}"
+      # - name: Debug User Value
+      #   run: echo " Lightsail User = ${{ secrets.REMOTE_USER }}"
 
-      - name: Debug Host Value
-        run: echo " Lightsail Host = ${{ secrets.REMOTE_HOST }}"
+      # - name: Debug Host Value
+      #   run: echo " Lightsail Host = ${{ secrets.REMOTE_HOST }}"
 
-      - name: Upload build to Lightsail
-        uses: appleboy/scp-action@v0.1.5
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: build.tar.gz
-          target: /opt/bitnami/projects/github-actions-test  # Change to your project directory on the Lightsail instance
+      # - name: Upload build to Lightsail
+      #   uses: appleboy/scp-action@v0.1.5
+      #   with:
+      #     host: ${{ secrets.REMOTE_HOST }}
+      #     username: ${{ secrets.REMOTE_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: build.tar.gz
+      #     target: /opt/bitnami/projects/github-actions-test  # Change to your project directory on the Lightsail instance
 
       - name: SSH and Deploy on Lightsail
         uses: appleboy/ssh-action@master
@@ -53,3 +53,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             ls -al /opt/bitnami/projects/github-actions-test
+            cd /opt/bitnami/projects/github-actions-test
+            npm run build
