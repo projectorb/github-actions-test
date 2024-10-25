@@ -54,4 +54,4 @@ jobs:
           script: |
             ls -al /opt/bitnami/projects/github-actions-test
             cd /opt/bitnami/projects/github-actions-test
-            npm run build
+            node -v
