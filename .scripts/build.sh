@@ -2,8 +2,6 @@ set -e
 
 echo "Building the project..."
 
-chmod +x .scripts/build.sh
-
 git pull origin main
 
 export NVM_DIR="$HOME/.nvm"
