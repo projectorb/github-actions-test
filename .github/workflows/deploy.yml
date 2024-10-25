@@ -45,14 +45,14 @@ jobs:
           source: build.tar.gz
           target: /opt/bitnami/projects/github-actions-test  # Change to your project directory on the Lightsail instance
 
-      - name: SSH and Deploy on Lightsail
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /opt/bitnami/projects/github-actions-test
-            tar -xzf build.tar.gz
-            npm install --omit=dev  # Install production dependencies only
-            pm2 restart nextjs-app  # Restart your app (adjust if using another process manager)
+      # - name: SSH and Deploy on Lightsail
+      #   uses: appleboy/ssh-action@v0.1.5
+      #   with:
+      #     host: ${{ secrets.REMOTE_HOST }}
+      #     username: ${{ secrets.REMOTE_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       cd /opt/bitnami/projects/github-actions-test
+      #       tar -xzf build.tar.gz
+      #       npm install --omit=dev  # Install production dependencies only
+      #       pm2 restart nextjs-app  # Restart your app (adjust if using another process manager)
