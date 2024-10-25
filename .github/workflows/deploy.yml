@@ -10,6 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Set to your Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: Archive production files
+        run: tar -czf build.tar.gz .next package.json
+      
       - name: Check SSH Key Access
         run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | wc -c
 
@@ -19,46 +36,23 @@ jobs:
       - name: Debug Host Value
         run: echo " Lightsail Host = ${{ secrets.REMOTE_HOST }}"
 
-      # - name: Manual SCP Upload for Debugging
-      #   run: |
-      #     echo "${{ secrets.LIGHTSAIL_SSH_KEY }}" > /tmp/lightsail_key.pem
-      #     chmod 600 /tmp/lightsail_key.pem
-      #     scp -i /tmp/lightsail_key.pem -o StrictHostKeyChecking=no build.tar.gz ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }}:/opt/bitnami/projects/github-actions-test/
+      - name: Upload build to Lightsail
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: build.tar.gz
+          target: /opt/bitnami/projects/github-actions-test  # Change to your project directory on the Lightsail instance
 
-      # - name: Checkout code
-      #   uses: actions/checkout@v3
-
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '18'  # Set to your Node.js version
-
-      # - name: Install dependencies
-      #   run: npm install
-
-      # - name: Build Next.js app
-      #   run: npm run build
-
-      # - name: Archive production files
-      #   run: tar -czf build.tar.gz .next package.json
-
-      # - name: Upload build to Lightsail
-      #   uses: appleboy/scp-action@v0.1.5
-      #   with:
-      #     host: ${{ secrets.LIGHTSAIL_HOST }}
-      #     username: ${{ secrets.LIGHTSAIL_USERNAME }}
-      #     key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-      #     source: build.tar.gz
-      #     target: /opt/bitnami/projects/github-actions-test  # Change to your project directory on the Lightsail instance
-
-      # - name: SSH and Deploy on Lightsail
-      #   uses: appleboy/ssh-action@v0.1.5
-      #   with:
-      #     host: ${{ secrets.LIGHTSAIL_HOST }}
-      #     username: ${{ secrets.LIGHTSAIL_USERNAME }}
-      #     key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-      #     script: |
-      #       cd /opt/bitnami/projects/github-actions-test
-      #       tar -xzf build.tar.gz
-      #       npm install --omit=dev  # Install production dependencies only
-      #       pm2 restart nextjs-app  # Restart your app (adjust if using another process manager)
+      - name: SSH and Deploy on Lightsail
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/bitnami/projects/github-actions-test
+            tar -xzf build.tar.gz
+            npm install --omit=dev  # Install production dependencies only
+            pm2 restart nextjs-app  # Restart your app (adjust if using another process manager)
